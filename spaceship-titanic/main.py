@@ -10,6 +10,8 @@ from sklearn.svm import SVC
 from sklearn.decomposition import PCA
 from sklearn.linear_model import LogisticRegression
 
+from sklearn.ensemble import RandomForestClassifier
+
 # source: https://www.kaggle.com/competitions/spaceship-titanic
 train_df = pd.read_csv("./train.csv")
 test_df = pd.read_csv("./test.csv")
@@ -42,9 +44,16 @@ svm = SVC(kernel='rbf', C=1.0)
 pipe_svc = make_pipeline(StandardScaler(), svm)
 pipe_svc.fit(X_train, y_train)
 
-print('Model accuracy =', pipe_svc.score(X_test, y_test))
+print('(SVM) Model accuracy =', pipe_svc.score(X_test, y_test))
 pred = pipe_svc.predict(XX).astype(bool)
 
+rfc = RandomForestClassifier(n_estimators=200, random_state=69420, n_jobs=-1)
+pipe_rfc = make_pipeline(rfc) # Just for syntax coherency
+pipe_rfc.fit(X_train, y_train)
+
+print('(RFC) Model accuracy =', pipe_rfc.score(X_test, y_test))
+pref = pipe_rfc.predict(XX).astype(bool)
+ 
 result = pd.DataFrame()
 result['PassengerId'] = test_df['PassengerId']
 result['Transported'] = pred

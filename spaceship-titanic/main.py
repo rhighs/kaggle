@@ -26,13 +26,13 @@ def clean_up_data(data):
     data = data.fillna(0).astype(int)
     return data
 
-train_df = clean_up_data(train_df)
-test_df = clean_up_data(test_df)
+c_train_df = clean_up_data(train_df)
+c_test_df = clean_up_data(test_df)
 # X_test = test_df.iloc[1:, :].values
 
-X = train_df.iloc[1:, :-1].values
-y = train_df.iloc[1:, -1].values
-XX = test_df.iloc[1:, :].values
+X = c_train_df.iloc[:, :-1].values
+y = c_train_df.iloc[:, -1].values
+XX = c_test_df.iloc[:, :].values
 
 X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.25, random_state=69420
@@ -42,7 +42,11 @@ svm = SVC(kernel='rbf', C=1.0)
 pipe_svc = make_pipeline(StandardScaler(), svm)
 pipe_svc.fit(X_train, y_train)
 
-print(pred.astype(bool))
-print(pipe_svc.score(X_test, y_test))
+print('Model accuracy =', pipe_svc.score(X_test, y_test))
 pred = pipe_svc.predict(XX).astype(bool)
-print('Final prediction: ', pipe_svc.predict(XX).astype(bool))
+
+result = pd.DataFrame()
+result['PassengerId'] = test_df['PassengerId']
+result['Transported'] = pred
+print(result)
+result.to_csv('result.csv', index=False)
